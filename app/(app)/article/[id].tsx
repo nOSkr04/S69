@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from "react-native";
+import {  Text, View } from "react-native";
 import React from "react";
 
 const ArticleDetailScreen = () => {
@@ -10,5 +10,3 @@ const ArticleDetailScreen = () => {
 };
 
 export default ArticleDetailScreen;
-
-const styles = StyleSheet.create({});
