@@ -36,7 +36,7 @@ export class HttpRequest {
       throw new Error("No uri found");
     }
 
-    const state = this.store.getState();
+    const state = this.store;
 
     const defaultOptions: any = {
       credentials: "include",
@@ -58,17 +58,6 @@ export class HttpRequest {
       defaultOptions.headers = {
         ...defaultOptions.headers,
         Authorization: `Bearer ${state.auth.accessToken}`,
-      };
-    }
-
-    if (
-      state.auth &&
-      state.auth.deviceToken &&
-      typeof state.auth.deviceToken === "string"
-    ) {
-      defaultOptions.headers = {
-        ...defaultOptions.headers,
-        "X-Device": state.auth.deviceToken,
       };
     }
 

@@ -9,9 +9,10 @@ import * as SplashScreen from "expo-splash-screen";
 export default function AppLayout() {
   const { session, isLoading } = useSession();
   const [loaded, error] = useFonts({
-    SpaceMono: require("../src/assets/fonts/SpaceMono-Regular.ttf"),
+    SpaceMono: require("../../assets/fonts/SpaceMono-Regular.ttf"),
     ...FontAwesome.font,
   });
+
 
   useEffect(() => {
     if (error) throw error;
