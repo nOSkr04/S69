@@ -2,16 +2,16 @@ import { IAuth } from "../interfaces/auth";
 import { IUser } from "../interfaces/user";
 
 export class Auth implements IAuth {
-  accessToken: string | null;
+  token: string | null;
   user: IUser | null;
   _id?: string | null;
 
   constructor({
-    accessToken,
+    token,
     user,
     _id,
   }: IAuth) {
-    this.accessToken = accessToken;
+    this.token = token;
     this.user = user;
     this._id = _id;
   }
