@@ -31,10 +31,9 @@ export { Button };
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor  : Colors.primary,
-        paddingVertical  : 18,
-        paddingHorizontal: 16,
-        borderRadius     : 16
+        backgroundColor: Colors.primary,
+        padding        : 12,
+        borderRadius   : 16
     },
     loading: {
         backgroundColor  : Colors.primary,

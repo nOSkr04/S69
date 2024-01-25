@@ -1,63 +1,81 @@
+/* eslint-disable no-undef */
 import qs from "qs";
-import { HttpHandler } from "./http-handler";
-import { store } from "./store";
+import HttpHandler from "./http-handler";
 
 type Options = {
   method: string;
   contentType?: string;
 };
 
-type JSONobj = any;
+interface _SourceUri {
+  uri: string;
+  [key: string]: any;
+}
 
-export class HttpRequest {
+type BodyInit_ =
+  | _SourceUri
+  | Blob
+  | Int8Array
+  | Int16Array
+  | Int32Array
+  | Uint8Array
+  | Uint16Array
+  | Uint32Array
+  | Uint8ClampedArray
+  | Float32Array
+  | Float64Array
+  | DataView
+  | ArrayBuffer
+  | FormData
+  | string
+  | null;
+
+type JSONobj = {
+  [key: string]: string | number | boolean | undefined | null | JSONobj | JSONobj[] | Blob;
+};
+
+class HttpRequest {
   uri?: string;
-  store?: any;
+  store?: Store;
   errorHandler?: (statusCode: number, error: HttpHandler) => void;
 
-  constructor(errorHandler?: (statusCode: number, error: HttpHandler) => void) {
+  constructor (errorHandler?: (statusCode: number, error: HttpHandler) => void) {
     this.errorHandler = errorHandler;
   }
 
-  async request(
-    api: string,
-    data: JSONobj,
-    options: Options,
-    header: any = {}
-  ) {
-    if (!this.store && !store) {
-      throw new Error("No store found");
-    }
-
+  async request (api: string, data: JSONobj, options: Options) {
     if (!this.store) {
-      this.store = store;
+      throw new Error("No store found");
     }
 
     if (!this.uri) {
       throw new Error("No uri found");
     }
 
-    const state = this.store;
+    const state = this.store.getState();
 
-    const defaultOptions: any = {
+    const defaultOptions: RequestInit = {
       credentials: "include",
       method     : options.method,
       headers    : {
         Accept        : "application/json",
         "Content-Type": "application/json; charset=utf-8",
-        ...header,
         // "X-Device"    : deviceToken,
-        // Authorization : accessToken ? `Bearer ${accessToken}` : "",
+        // Authorization : token ? `Bearer ${token}` : "",
       },
     };
 
-    if (
-      state.auth &&
-      state.auth.accessToken &&
-      typeof state.auth.accessToken === "string"
-    ) {
+    if (state.auth && state.auth.token && typeof state.auth.token === "string") {
       defaultOptions.headers = {
         ...defaultOptions.headers,
-        Authorization: `Bearer ${state.auth.accessToken}`,
+        Authorization: `Bearer ${state.auth.token}`,
+      };
+    }
+
+    if (state.auth && state.auth.deviceToken && typeof state.auth.deviceToken === "string") {
+      defaultOptions.headers = {
+        ...defaultOptions.headers,
+        "X-Device": state.auth.deviceToken,
       };
     }
 
@@ -67,9 +85,9 @@ export class HttpRequest {
         ["Content-Type"]: options.contentType,
       };
 
-      defaultOptions.body = data as any;
+      defaultOptions.body = data as BodyInit_;
     } else {
-      defaultOptions.body = JSON.stringify(data) as any;
+      defaultOptions.body = JSON.stringify(data) as BodyInit_;
     }
 
     let queryString = "";
@@ -80,10 +98,7 @@ export class HttpRequest {
     }
 
     try {
-      const res = await fetch(
-        `${this.uri}${api}${queryString}`,
-        defaultOptions
-      );
+      const res = await fetch(`${this.uri}${api}${queryString}`, defaultOptions);
       const http = new HttpHandler(res.status);
 
       const response = await http.handle(res);
@@ -99,26 +114,29 @@ export class HttpRequest {
     }
   }
 
-  get(api: string, data?: JSONobj, header?: any) {
-    return this.request(api, data || {}, { method: "GET" }, header);
+  get (api: string, data?: JSONobj) {
+    return this.request(api, data || {}, { method: "GET" });
   }
 
-  post(api: string, data?: JSONobj, header?: any) {
-    return this.request(api, data || {}, { method: "POST" }, header);
+  post (api: string, data?: JSONobj) {
+    return this.request(api, data || {}, { method: "POST" });
   }
 
-  put(api: string, data?: JSONobj, header?: any) {
-    return this.request(api, data || {}, { method: "PUT" }, header);
+  put (api: string, data?: JSONobj) {
+    return this.request(api, data || {}, { method: "PUT" });
   }
 
-  del(api: string, data?: JSONobj, header?: any) {
-    return this.request(api, data || {}, { method: "DELETE" }, header);
+  del (api: string, data?: JSONobj) {
+    return this.request(api, data || {}, { method: "DELETE" });
   }
 
-  upload(api: string, data?: JSONobj) {
-    return this.request(api, data || {}, {
-      method     : "POST",
-      contentType: "multipart/form-data",
-    });
+  upload (api: string, data?: JSONobj) {
+    return this.request(api, data || {}, { method: "POST", contentType: "multipart/form-data" });
+  }
+
+  uploadImage (api: string, data?: JSONobj) {
+    return this.request(api, data || {}, { method: "PUT", contentType: "multipart/form-data" });
   }
 }
+
+export default HttpRequest;

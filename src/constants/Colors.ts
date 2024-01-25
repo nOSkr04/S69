@@ -9,6 +9,9 @@ abstract class Colors {
   static dark75 = "#5F6265";
   static background = "#1F222A";
   static secondary = "#9E9E9E";
+  static dark2 = "#35383F";
+  static primaryT8 = "rgba(1, 183, 99, 0.08)";
+
 }
 
 export { Colors };

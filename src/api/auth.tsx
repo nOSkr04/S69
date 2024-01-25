@@ -4,6 +4,6 @@ import { HttpRequest } from "../utils";
 const httpRequest = new HttpRequest();
 
 export const login = async (data: ILoginForm) => {
-  const res = await httpRequest.post("/login", data);
+  const res = await httpRequest.post("/user/login", data);
   return res;
 };
